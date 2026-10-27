@@ -14,8 +14,8 @@ requests>=2.31.0
 # Production static file serving
 whitenoise>=6.8.0
 
+# PostgreSQL database adapter
+psycopg2-binary>=2.9.9
+
 # Production WSGI server
 gunicorn>=23.0.0
-
-# Optional PostgreSQL database adapter for production (installed in production)
-# psycopg2-binary>=2.9.9

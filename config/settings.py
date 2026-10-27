@@ -4,6 +4,9 @@ Django settings for StreamFlix project.
 
 import os
 from pathlib import Path
+from urllib.parse import parse_qs, unquote, urlparse
+
+from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -12,16 +15,29 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Load environment variables from .env file
 load_dotenv(BASE_DIR / '.env')
 
-# Quick-start development settings - unsuitable for production
-SECRET_KEY = os.getenv(
-    'SECRET_KEY',
-    'django-insecure-streamflix-dev-secret-key-default-2026'
+IS_VERCEL = os.getenv('VERCEL') == '1'
+
+SECRET_KEY = os.getenv('SECRET_KEY')
+if not SECRET_KEY:
+    if IS_VERCEL:
+        raise ImproperlyConfigured('SECRET_KEY must be configured in Vercel environment variables.')
+    SECRET_KEY = 'django-insecure-local-development-only'
+
+DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1', 'yes')
+
+hosts_env = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,testserver')
+ALLOWED_HOSTS = [host.strip() for host in hosts_env.split(',') if host.strip()]
+ALLOWED_HOSTS.extend(host for host in ('.vercel.app', '.now.sh') if host not in ALLOWED_HOSTS)
+
+csrf_origins_env = os.getenv('CSRF_TRUSTED_ORIGINS', '')
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip() for origin in csrf_origins_env.split(',') if origin.strip()
+]
+CSRF_TRUSTED_ORIGINS.extend(
+    origin
+    for origin in ('https://*.vercel.app', 'https://*.now.sh')
+    if origin not in CSRF_TRUSTED_ORIGINS
 )
-
-DEBUG = os.getenv('DEBUG', 'True').lower() in ('true', '1', 'yes')
-
-hosts_env = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,testserver,*')
-ALLOWED_HOSTS = [h.strip() for h in hosts_env.split(',') if h.strip()]
 
 # Application definition
 INSTALLED_APPS = [
@@ -72,8 +88,30 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
-# Uses PostgreSQL if DB_ENGINE or DB credentials provided; otherwise defaults to SQLite
-if os.getenv('DB_ENGINE') == 'django.db.backends.postgresql' or (os.getenv('DB_NAME') and os.getenv('DB_USER')):
+DATABASE_URL = os.getenv('DATABASE_URL')
+if DATABASE_URL:
+    parsed_database_url = urlparse(DATABASE_URL)
+    if parsed_database_url.scheme not in ('postgres', 'postgresql'):
+        raise ImproperlyConfigured('DATABASE_URL must be a PostgreSQL connection URL.')
+
+    database_options = {
+        key: values[-1]
+        for key, values in parse_qs(parsed_database_url.query).items()
+        if key == 'sslmode' and values
+    }
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': unquote(parsed_database_url.path.lstrip('/')),
+            'USER': unquote(parsed_database_url.username or ''),
+            'PASSWORD': unquote(parsed_database_url.password or ''),
+            'HOST': parsed_database_url.hostname or '',
+            'PORT': str(parsed_database_url.port or ''),
+            'OPTIONS': database_options,
+            'CONN_MAX_AGE': 60,
+        }
+    }
+elif os.getenv('DB_ENGINE') == 'django.db.backends.postgresql' or (os.getenv('DB_NAME') and os.getenv('DB_USER')):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -123,7 +161,18 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # WhiteNoise storage for efficient static file handling in production
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': (
+            'whitenoise.storage.CompressedManifestStaticFilesStorage'
+            if not DEBUG
+            else 'whitenoise.storage.CompressedStaticFilesStorage'
+        ),
+    },
+}
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -143,25 +192,20 @@ TMDB_TIMEOUT = float(os.getenv('TMDB_TIMEOUT', '5.0'))
 
 # Security settings for production
 if not DEBUG:
-    SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', 'False').lower() in ('true', '1')
-    SESSION_COOKIE_SECURE = os.getenv('SESSION_COOKIE_SECURE', 'False').lower() in ('true', '1')
-    CSRF_COOKIE_SECURE = os.getenv('CSRF_COOKIE_SECURE', 'False').lower() in ('true', '1')
+    SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', str(IS_VERCEL)).lower() in ('true', '1', 'yes')
+    SESSION_COOKIE_SECURE = os.getenv('SESSION_COOKIE_SECURE', 'True').lower() in ('true', '1', 'yes')
+    CSRF_COOKIE_SECURE = os.getenv('CSRF_COOKIE_SECURE', 'True').lower() in ('true', '1', 'yes')
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'DENY'
+    if IS_VERCEL:
+        SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Logging configuration
-LOGS_DIR = BASE_DIR / 'logs'
-LOGS_DIR.mkdir(exist_ok=True)
-
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
-        'verbose': {
-            'format': '[{asctime}] {levelname} {name}: {message}',
-            'style': '{',
-        },
         'simple': {
             'format': '[{asctime}] {levelname}: {message}',
             'style': '{',
@@ -172,27 +216,19 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'simple',
         },
-        'file': {
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': LOGS_DIR / 'streamflix.log',
-            'maxBytes': 5 * 1024 * 1024,  # 5 MB
-            'backupCount': 5,
-            'formatter': 'verbose',
-            'encoding': 'utf-8',
-        },
     },
     'root': {
-        'handlers': ['console', 'file'],
+        'handlers': ['console'],
         'level': 'INFO',
     },
     'loggers': {
         'streamflix': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console'],
             'level': 'INFO',
             'propagate': False,
         },
         'django.request': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console'],
             'level': 'WARNING',
             'propagate': False,
         },
