@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ movie.title }} — StreamFlix Details{% endblock %}
+
+{% block content %}
+<!-- Cinematic Backdrop Hero -->
+<section class="detail-backdrop" style="background-image: url('{{ movie.backdrop_url }}');">
+  <div class="detail-overlay"></div>
+  <div class="container">
+    <div class="detail-hero-content">
+      <!-- Poster -->
+      <div class="detail-poster-wrap">
+        <img
+          src="{{ movie.poster_url }}"
+          alt="{{ movie.title }}"
+          class="detail-poster"
+          onerror="this.src='/static/images/poster_placeholder.png'"
+        />
+      </div>
+
+      <!-- Info & Actions -->
+      <div class="detail-info">
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; flex-wrap: wrap;">
+          <a href="{% url 'discover' %}" class="btn btn-ghost btn-sm" style="padding: 0.2rem 0.6rem;">
+            ← Back to Catalog
+          </a>
+          <span class="badge badge-warning">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            {{ movie.rating|floatformat:1 }} Rating
+          </span>
+          {% if movie.vote_count %}
+            <span style="font-size: 0.8rem; color: var(--text-muted);">({{ movie.vote_count }} reviews)</span>
+          {% endif %}
+        </div>
+
+        <h1 class="detail-title">{{ movie.title }}</h1>
+
+        <div class="detail-meta-row">
+          <span>{{ movie.release_date|default:"2024" }}</span>
+          <span>•</span>
+          <span>{{ movie.genre }}</span>
+          {% if movie.runtime %}
+            <span>•</span>
+            <span>{{ movie.runtime }} mins</span>
+          {% endif %}
+        </div>
+
+        <p class="detail-overview">{{ movie.overview }}</p>
+
+        <!-- Action Buttons -->
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+          {% if movie.trailer_url %}
+            <button type="button" class="btn btn-primary btn-lg" data-trailer-url="{{ movie.trailer_url }}">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              Watch Official Trailer
+            </button>
+          {% endif %}
+
+          <button
+            type="button"
+            class="btn btn-secondary btn-lg btn-toggle-list {% if is_saved %}saved{% endif %}"
+            data-movie-id="{{ movie.id }}"
+          >
+            {% if is_saved %}
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              In My List
+            {% else %}
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              Add to My List
+            {% endif %}
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-ghost btn-sm"
+            data-open-assistant="Tell me about the movie {{ movie.title }}"
+            title="Ask StreamFlix Assistant about this movie"
+          >
+            Ask Assistant
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Similar Recommendations Row -->
+{% if similar_movies %}
+  <div class="container" style="padding-top: 3rem; padding-bottom: 4rem;">
+    <div class="section-header" style="padding: 0; margin-bottom: 1.5rem;">
+      <h2 class="section-title">Similar Recommended Movies</h2>
+    </div>
+    <div class="movie-row-wrapper">
+      <button class="row-scroll-btn left" aria-label="Scroll left">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <div class="movie-row">
+        {% for sim in similar_movies %}
+          {% include 'includes/movie_card.html' with movie=sim %}
+        {% endfor %}
+      </div>
+      <button class="row-scroll-btn right" aria-label="Scroll right">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </button>
+    </div>
+  </div>
+{% endif %}
+{% endblock %}

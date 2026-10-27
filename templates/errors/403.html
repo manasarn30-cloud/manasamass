@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}403 — Forbidden | StreamFlix{% endblock %}
+
+{% block content %}
+<div class="error-page-wrap">
+  <div class="error-code-huge">403</div>
+  <h1 class="error-title">Access Forbidden</h1>
+  <p class="error-description">
+    You do not have administrative or ownership permissions to view or edit this resource (such as inspecting another user's private support ticket).
+  </p>
+
+  <div class="error-actions">
+    <a href="{% url 'home' %}" class="btn btn-primary btn-lg">Return Home</a>
+    <a href="{% url 'support' %}" class="btn btn-secondary btn-lg">My Support Desk</a>
+    <button type="button" class="btn btn-ghost btn-lg" data-open-assistant="Explain Error 403">
+      Ask the Assistant
+    </button>
+  </div>
+</div>
+{% endblock %}

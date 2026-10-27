@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}500 — Server Error | StreamFlix{% endblock %}
+
+{% block content %}
+<div class="error-page-wrap">
+  <div class="error-code-huge" style="background: linear-gradient(135deg, #FF5C68 0%, #FF315A 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">500</div>
+  <h1 class="error-title">Something went wrong on our side.</h1>
+  <p class="error-description">
+    An unexpected server condition occurred while processing your request. Our automated error monitors have recorded this incident for review.
+  </p>
+
+  <div class="error-actions">
+    <button type="button" class="btn btn-primary btn-lg" onclick="window.location.reload();">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+      Retry Request
+    </button>
+    <a href="{% url 'home' %}" class="btn btn-secondary btn-lg">
+      Return Home
+    </a>
+    <button type="button" class="btn btn-ghost btn-lg" data-open-assistant="What does Error 500 mean?">
+      Ask the Assistant
+    </button>
+  </div>
+</div>
+{% endblock %}

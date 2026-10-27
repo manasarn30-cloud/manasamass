@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: streamflix-app
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate && python manage.py seed_faqs && python manage.py seed_movies"
+    startCommand: "gunicorn config.wsgi:application --bind 0.0.0.0:$PORT"
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com,localhost,127.0.0.1"
+      - key: SECURE_SSL_REDIRECT
+        value: "True"
+      - key: SESSION_COOKIE_SECURE
+        value: "True"
+      - key: CSRF_COOKIE_SECURE
+        value: "True"
+      - key: MONGO_URI
+        sync: false
+      - key: MONGO_DB_NAME
+        value: "streamflix_prod"
+      - key: TMDB_API_KEY
+        sync: false
+      - key: TMDB_TIMEOUT
+        value: "5.0"

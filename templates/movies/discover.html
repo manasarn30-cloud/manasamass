@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Discover & Search Movies — StreamFlix{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 2.5rem; padding-bottom: 4rem;">
+
+  <!-- Header -->
+  <div style="margin-bottom: 2rem;">
+    <h1 style="font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 0.4rem;">
+      Explore Catalog
+    </h1>
+    <p style="color: var(--text-muted); font-size: 1rem;">
+      Search titles, filter by genre, and discover your next favorite movie.
+    </p>
+  </div>
+
+  <!-- Search & Filter Controls -->
+  <form method="GET" action="{% url 'discover' %}" class="filter-bar" id="discover-filter-form">
+    <!-- Search Query -->
+    <div class="search-input-wrap">
+      <svg class="search-icon-fixed" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input
+        type="search"
+        name="q"
+        value="{{ query }}"
+        class="search-input"
+        placeholder="Search by movie title or synopsis..."
+        autocomplete="off"
+        aria-label="Search movies"
+      />
+    </div>
+
+    <!-- Hidden Genre Input for Form Submission -->
+    <input type="hidden" name="genre" id="selected-genre-input" value="{{ selected_genre }}" />
+
+    <!-- Sort Options -->
+    <div style="min-width: 170px;">
+      <select name="sort" class="form-select" onchange="document.getElementById('discover-filter-form').submit();" aria-label="Sort movies">
+        <option value="rating_desc" {% if sort_by == 'rating_desc' %}selected{% endif %}>Highest Rated</option>
+        <option value="rating_asc" {% if sort_by == 'rating_asc' %}selected{% endif %}>Lowest Rated</option>
+        <option value="release_desc" {% if sort_by == 'release_desc' %}selected{% endif %}>Newest Releases</option>
+        <option value="title_asc" {% if sort_by == 'title_asc' %}selected{% endif %}>Title (A - Z)</option>
+      </select>
+    </div>
+
+    <!-- Genre Chips Row -->
+    <div style="width: 100%; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-top: 0.5rem; padding-top: 1rem; border-top: 1px solid var(--border-subtle);">
+      <div class="genre-chips">
+        {% for g in genres %}
+          <button
+            type="button"
+            class="genre-chip {% if selected_genre == g %}active{% endif %}"
+            onclick="selectGenre('{{ g }}');"
+          >
+            {{ g }}
+          </button>
+        {% endfor %}
+      </div>
+
+      <div style="font-size: 0.88rem; color: var(--text-muted);">
+        Found <strong style="color: var(--text-primary);">{{ total_results }}</strong> titles
+      </div>
+    </div>
+  </form>
+
+  <!-- Movie Grid Results -->
+  {% if movies %}
+    <div class="movie-grid">
+      {% for movie in movies %}
+        {% include 'includes/movie_card.html' with movie=movie %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <!-- Empty Results State -->
+    <div class="empty-state">
+      <div class="empty-state-icon">🎬</div>
+      <h2 class="empty-state-title">No Movies Found</h2>
+      <p class="empty-state-text">
+        We couldn't find any titles matching "{% if query %}{{ query }}{% else %}{{ selected_genre }}{% endif %}".
+        Try another search term or reset your filters.
+      </p>
+      <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="{% url 'discover' %}" class="btn btn-secondary btn-sm">Clear Filters</a>
+        <button type="button" class="btn btn-primary btn-sm" data-open-assistant="How do I search for movies?">
+          Ask Assistant
+        </button>
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+
+<script>
+  function selectGenre(genreName) {
+    document.getElementById('selected-genre-input').value = genreName;
+    document.getElementById('discover-filter-form').submit();
+  }
+</script>
+{% endblock %}

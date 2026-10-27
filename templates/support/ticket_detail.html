@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ticket #{{ ticket.reference_number }} — StreamFlix Support{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 3rem; padding-bottom: 5rem; max-width: 900px;">
+
+  <div style="margin-bottom: 1.5rem;">
+    <a href="{% url 'support' %}" class="btn btn-ghost btn-sm" style="margin-bottom: 1rem;">
+      ← Back to Support Desk
+    </a>
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <span style="font-family: monospace; font-size: 0.95rem; color: var(--accent-hover); font-weight: 700;">
+          {{ ticket.reference_number }}
+        </span>
+        <h1 style="font-size: 2rem; font-weight: 800; margin-top: 0.25rem;">{{ ticket.subject }}</h1>
+      </div>
+      <div>
+        <span class="badge {{ ticket.status_badge_class }}" style="font-size: 0.9rem; padding: 0.4rem 0.9rem;">
+          {{ ticket.status }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ticket Metadata Card -->
+  <div style="background: var(--surface-card); border: 1px solid var(--border-medium); border-radius: var(--radius-lg); padding: 2rem; box-shadow: var(--shadow-sm); margin-bottom: 2rem;">
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-subtle); font-size: 0.9rem;">
+      <div>
+        <span style="color: var(--text-muted); display: block; font-size: 0.8rem;">Category</span>
+        <strong>{{ ticket.category }}</strong>
+      </div>
+      <div>
+        <span style="color: var(--text-muted); display: block; font-size: 0.8rem;">Priority</span>
+        <strong>{{ ticket.priority }}</strong>
+      </div>
+      <div>
+        <span style="color: var(--text-muted); display: block; font-size: 0.8rem;">Created At</span>
+        <span>{{ ticket.created_at|date:"F d, Y H:i" }} UTC</span>
+      </div>
+      <div>
+        <span style="color: var(--text-muted); display: block; font-size: 0.8rem;">Source</span>
+        <span>{{ ticket.source }}</span>
+      </div>
+    </div>
+
+    <div>
+      <h3 style="font-size: 1rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.75rem;">
+        Ticket Description
+      </h3>
+      <div style="background: var(--bg-primary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.25rem; font-size: 0.95rem; line-height: 1.7; white-space: pre-wrap; color: var(--text-primary);">
+{{ ticket.description }}
+      </div>
+    </div>
+
+    {% if ticket.resolved_at %}
+      <div style="margin-top: 1.5rem; padding: 0.75rem 1rem; background: var(--success-bg); border: 1px solid var(--success); border-radius: var(--radius-md); color: var(--success); font-size: 0.88rem;">
+        ✓ This ticket was marked as resolved on {{ ticket.resolved_at|date:"M d, Y H:i" }} UTC.
+      </div>
+    {% endif %}
+
+  </div>
+
+  <!-- Need help callout -->
+  <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; background: var(--surface-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.25rem 1.75rem;">
+    <div>
+      <h4 style="font-size: 1rem; font-weight: 600;">Have an update on this inquiry?</h4>
+      <p style="font-size: 0.85rem; color: var(--text-muted);">
+        Ask our assistant to check for status updates or append diagnostic notes.
+      </p>
+    </div>
+    <button type="button" class="btn btn-secondary btn-sm" data-open-assistant="Update on ticket {{ ticket.reference_number }}">
+      Ask Assistant about this Ticket
+    </button>
+  </div>
+
+</div>
+{% endblock %}

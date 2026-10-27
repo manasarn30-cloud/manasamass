@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}401 — Unauthorized | StreamFlix{% endblock %}
+
+{% block content %}
+<div class="error-page-wrap">
+  <div class="error-code-huge">401</div>
+  <h1 class="error-title">Authentication Required</h1>
+  <p class="error-description">
+    You must be signed in with a valid StreamFlix account to view this resource or perform this action.
+  </p>
+
+  <div class="error-actions">
+    <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-primary btn-lg">Sign In</a>
+    <a href="{% url 'signup' %}" class="btn btn-secondary btn-lg">Create Free Account</a>
+    <button type="button" class="btn btn-ghost btn-lg" data-open-assistant="What does Error 401 mean?">
+      Ask the Assistant
+    </button>
+  </div>
+</div>
+{% endblock %}

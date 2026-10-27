@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}503 — Service Unavailable | StreamFlix{% endblock %}
+
+{% block content %}
+<div class="error-page-wrap">
+  <div class="error-code-huge">503</div>
+  <h1 class="error-title">Service Temporarily Unavailable</h1>
+  <p class="error-description">
+    StreamFlix is undergoing scheduled maintenance or experiencing temporary capacity limits. All cached catalog entries remain preserved.
+  </p>
+
+  <div class="error-actions">
+    <button type="button" class="btn btn-primary btn-lg" onclick="window.location.reload();">
+      Check Again
+    </button>
+    <a href="{% url 'health_check' %}" class="btn btn-secondary btn-lg" target="_blank">
+      System Health Status
+    </a>
+    <button type="button" class="btn btn-ghost btn-lg" data-open-assistant="Explain Error 503">
+      Ask the Assistant
+    </button>
+  </div>
+</div>
+{% endblock %}

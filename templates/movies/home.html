@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}StreamFlix — Watch Trailers, Discover Movies & AI Support{% endblock %}
+
+{% block content %}
+<!-- Cinematic Featured Hero Section -->
+{% if hero_movie %}
+  <section class="hero-section" style="background-image: url('{{ hero_movie.backdrop_url }}');" role="region" aria-label="Featured Movie">
+    <div class="hero-overlay"></div>
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-badge-row">
+          <span class="hero-tag">Featured Premiere</span>
+          <div class="hero-meta">
+            <span>{{ hero_movie.release_year|default:"2024" }}</span>
+            <span>•</span>
+            <span class="rating-badge">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+              {{ hero_movie.rating|floatformat:1 }} Rating
+            </span>
+            <span>•</span>
+            <span>{{ hero_movie.genre }}</span>
+          </div>
+        </div>
+
+        <h1 class="hero-title">{{ hero_movie.title }}</h1>
+        <p class="hero-overview">{{ hero_movie.overview }}</p>
+
+        <div class="hero-actions">
+          {% if hero_movie.trailer_url %}
+            <button type="button" class="btn btn-primary btn-lg" data-trailer-url="{{ hero_movie.trailer_url }}">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              Watch Official Trailer
+            </button>
+          {% endif %}
+
+          <button
+            type="button"
+            class="btn btn-secondary btn-lg btn-toggle-list {% if hero_movie.id in saved_ids %}saved{% endif %}"
+            data-movie-id="{{ hero_movie.id }}"
+          >
+            {% if hero_movie.id in saved_ids %}
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              In My List
+            {% else %}
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              Add to My List
+            {% endif %}
+          </button>
+
+          <a href="{% url 'movie_detail' hero_movie.id %}" class="btn btn-ghost btn-lg">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            More Info
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endif %}
+
+<!-- Movie Categorized Rows -->
+<div class="container" style="padding-top: 1.5rem; padding-bottom: 3rem;">
+
+  <!-- Trending Now -->
+  <section class="movie-section" aria-labelledby="heading-trending">
+    <div class="section-header" style="padding: 0;">
+      <h2 id="heading-trending" class="section-title">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+        Trending Now
+      </h2>
+      <a href="{% url 'discover' %}?sort=rating_desc" class="section-link">See All</a>
+    </div>
+    <div class="movie-row-wrapper">
+      <button class="row-scroll-btn left" aria-label="Scroll left">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <div class="movie-row">
+        {% for movie in trending_movies %}
+          {% include 'includes/movie_card.html' with movie=movie %}
+        {% endfor %}
+      </div>
+      <button class="row-scroll-btn right" aria-label="Scroll right">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- Popular This Week -->
+  <section class="movie-section" aria-labelledby="heading-popular">
+    <div class="section-header" style="padding: 0;">
+      <h2 id="heading-popular" class="section-title">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+        Popular Blockbusters
+      </h2>
+      <a href="{% url 'discover' %}?sort=rating_desc" class="section-link">See All</a>
+    </div>
+    <div class="movie-row-wrapper">
+      <button class="row-scroll-btn left" aria-label="Scroll left">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <div class="movie-row">
+        {% for movie in popular_movies %}
+          {% include 'includes/movie_card.html' with movie=movie %}
+        {% endfor %}
+      </div>
+      <button class="row-scroll-btn right" aria-label="Scroll right">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- Science Fiction & Mind-Benders -->
+  <section class="movie-section" aria-labelledby="heading-scifi">
+    <div class="section-header" style="padding: 0;">
+      <h2 id="heading-scifi" class="section-title">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--info)" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
+        Sci-Fi & Cyberpunk
+      </h2>
+      <a href="{% url 'discover' %}?genre=Sci-Fi" class="section-link">See All</a>
+    </div>
+    <div class="movie-row-wrapper">
+      <button class="row-scroll-btn left" aria-label="Scroll left">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <div class="movie-row">
+        {% for movie in scifi_movies %}
+          {% include 'includes/movie_card.html' with movie=movie %}
+        {% endfor %}
+      </div>
+      <button class="row-scroll-btn right" aria-label="Scroll right">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- Action & High Voltage -->
+  <section class="movie-section" aria-labelledby="heading-action">
+    <div class="section-header" style="padding: 0;">
+      <h2 id="heading-action" class="section-title">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent-hover)" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+        Action & Thrills
+      </h2>
+      <a href="{% url 'discover' %}?genre=Action" class="section-link">See All</a>
+    </div>
+    <div class="movie-row-wrapper">
+      <button class="row-scroll-btn left" aria-label="Scroll left">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <div class="movie-row">
+        {% for movie in action_movies %}
+          {% include 'includes/movie_card.html' with movie=movie %}
+        {% endfor %}
+      </div>
+      <button class="row-scroll-btn right" aria-label="Scroll right">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- Mystery & Thriller -->
+  <section class="movie-section" aria-labelledby="heading-thriller">
+    <div class="section-header" style="padding: 0;">
+      <h2 id="heading-thriller" class="section-title">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        Mystery & Crime Thrillers
+      </h2>
+      <a href="{% url 'discover' %}?genre=Thriller" class="section-link">See All</a>
+    </div>
+    <div class="movie-row-wrapper">
+      <button class="row-scroll-btn left" aria-label="Scroll left">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <div class="movie-row">
+        {% for movie in thriller_movies %}
+          {% include 'includes/movie_card.html' with movie=movie %}
+        {% endfor %}
+      </div>
+      <button class="row-scroll-btn right" aria-label="Scroll right">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- Drama & Award Winners -->
+  <section class="movie-section" aria-labelledby="heading-drama">
+    <div class="section-header" style="padding: 0;">
+      <h2 id="heading-drama" class="section-title">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H7c-.55 0-1-.45-1-1v-2.34"></path><path d="M14 14.66V17c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-2.34"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+        Critically Acclaimed Drama
+      </h2>
+      <a href="{% url 'discover' %}?genre=Drama" class="section-link">See All</a>
+    </div>
+    <div class="movie-row-wrapper">
+      <button class="row-scroll-btn left" aria-label="Scroll left">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <div class="movie-row">
+        {% for movie in drama_movies %}
+          {% include 'includes/movie_card.html' with movie=movie %}
+        {% endfor %}
+      </div>
+      <button class="row-scroll-btn right" aria-label="Scroll right">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </button>
+    </div>
+  </section>
+
+</div>
+{% endblock %}

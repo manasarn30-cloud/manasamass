@@ -1,0 +1,59 @@
+<footer class="site-footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="brand-logo">
+          <svg class="logo-icon" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          <span>STREAM<span class="logo-accent">FLIX</span></span>
+        </div>
+        <p>A next-generation streaming portal and entertainment platform featuring an intelligent FAQ-driven AI support assistant and resilient multi-database architecture.</p>
+        <div style="margin-top: 1rem; display: flex; gap: 0.5rem; align-items: center;">
+          <span class="badge badge-info" style="text-transform: none; font-size: 0.72rem;">{{ tmdb_mode }}</span>
+          <span class="badge badge-success" style="text-transform: none; font-size: 0.72rem;">MongoDB Chat Layer</span>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Navigation</h4>
+        <ul class="footer-links">
+          <li><a href="{% url 'home' %}">Home Dashboard</a></li>
+          <li><a href="{% url 'discover' %}">Browse & Discover</a></li>
+          <li><a href="{% url 'my_list' %}">Personal My List</a></li>
+          <li><a href="{% url 'faq' %}">Help Center & FAQ</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Support & Diagnostics</h4>
+        <ul class="footer-links">
+          <li><a href="{% url 'support' %}">Submit Support Ticket</a></li>
+          <li><a href="#" data-open-assistant="Explain Error 404">Error 404 Guide</a></li>
+          <li><a href="#" data-open-assistant="Explain Error 500">Error 500 Guide</a></li>
+          <li><a href="#" data-open-assistant="What is Error 460?">Diagnostic Code 460</a></li>
+          <li><a href="{% url 'health_check' %}" target="_blank">System Health API</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Technical Architecture</h4>
+        <ul class="footer-links">
+          <li><span style="color: var(--text-muted);">Backend: Django 6 + Python 3.14</span></li>
+          <li><span style="color: var(--text-muted);">Primary SQL: SQLite / PostgreSQL</span></li>
+          <li><span style="color: var(--text-muted);">Chat Store: MongoDB Atlas / PyMongo</span></li>
+          <li><span style="color: var(--text-muted);">Third-Party: TMDB API + Fallback</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div>
+        &copy; {{ current_year }} StreamFlix Inc. Built for demonstration & educational research. All movie metadata and imagery courtesy of TMDB.
+      </div>
+      <div>
+        <a href="{% url 'health_check' %}" style="color: var(--text-muted); font-size: 0.8rem; text-decoration: underline;">Status: /health/</a>
+      </div>
+    </div>
+  </div>
+</footer>

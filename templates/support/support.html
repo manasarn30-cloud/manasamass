@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Support Desk & Ticket Creation — StreamFlix{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 3rem; padding-bottom: 5rem;">
+
+  <div style="margin-bottom: 2.5rem;">
+    <span class="badge badge-warning" style="margin-bottom: 0.5rem;">Help Desk</span>
+    <h1 style="font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px;">Customer Support Desk</h1>
+    <p style="color: var(--text-muted); font-size: 1rem;">
+      Open a support ticket or track your previous inquiries. Stored in relational SQL with full audit history.
+    </p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 2.5rem; align-items: start;">
+
+    <!-- Left Column: Submit New Ticket Form -->
+    <div style="background: var(--surface-card); border: 1px solid var(--border-medium); border-radius: var(--radius-lg); padding: 2rem; box-shadow: var(--shadow-md);">
+      <h2 style="font-size: 1.35rem; font-weight: 700; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+        Submit New Support Ticket
+      </h2>
+
+      <form method="POST" action="{% url 'create_ticket' %}">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div style="padding: 0.75rem 1rem; background: var(--error-bg); border: 1px solid var(--error); border-radius: var(--radius-md); color: var(--error); font-size: 0.88rem; margin-bottom: 1rem;">
+            {{ form.non_field_errors }}
+          </div>
+        {% endif %}
+
+        <div class="form-group">
+          <label class="form-label" for="id_subject">Subject / Issue Summary *</label>
+          {{ form.subject }}
+          {% if form.subject.errors %}
+            <div class="form-error">{{ form.subject.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label class="form-label" for="id_category">Category *</label>
+            {{ form.category }}
+            {% if form.category.errors %}
+              <div class="form-error">{{ form.category.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="id_priority">Priority</label>
+            {{ form.priority }}
+            {% if form.priority.errors %}
+              <div class="form-error">{{ form.priority.errors.0 }}</div>
+            {% endif %}
+          </div>
+        </div>
+
+        {% if not user.is_authenticated %}
+          <div class="form-group">
+            <label class="form-label" for="id_guest_email">Your Contact Email (Optional for Guest Tracking)</label>
+            {{ form.guest_email }}
+            {% if form.guest_email.errors %}
+              <div class="form-error">{{ form.guest_email.errors.0 }}</div>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        <div class="form-group">
+          <label class="form-label" for="id_description">Detailed Description *</label>
+          {{ form.description }}
+          {% if form.description.errors %}
+            <div class="form-error">{{ form.description.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 1.5rem;">
+          <button type="submit" class="btn btn-primary btn-lg">
+            Create Support Ticket
+          </button>
+          <button type="button" class="btn btn-ghost btn-sm" data-open-assistant="true">
+            Try AI Assistant First
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Right Column: Quick Support Info & Chatbot Banner -->
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+      <div style="background: var(--surface-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 1.75rem;">
+        <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--accent-primary);">
+          Instant Automated Help
+        </h3>
+        <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem;">
+          Did you know? Our StreamFlix Assistant can instantly explain HTTP error codes (like 400, 404, 500, and 460) or search FAQs directly without waiting for ticket triage.
+        </p>
+        <button type="button" class="btn btn-secondary btn-sm" data-open-assistant="I have a question about StreamFlix" style="width: 100%;">
+          Open Assistant Now
+        </button>
+      </div>
+
+      <div style="background: var(--surface-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 1.75rem;">
+        <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem;">
+          Support SLA & Guidelines
+        </h3>
+        <ul style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.8; margin-left: 1.25rem;">
+          <li>High priority issues are reviewed within 4 hours.</li>
+          <li>Never share passwords or payment details in ticket descriptions.</li>
+          <li>Tickets are assigned a unique tracking reference (e.g. SF-TICK-XXXXXXXX).</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Previous Tickets Section -->
+  <div style="margin-top: 4rem;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+      <h2 style="font-size: 1.4rem; font-weight: 700;">Your Support Tickets</h2>
+      <span style="font-size: 0.88rem; color: var(--text-muted);">{{ total_tickets }} Active/Resolved Inquiries</span>
+    </div>
+
+    {% if user_tickets %}
+      <div style="overflow-x: auto;">
+        <table class="ticket-table" role="table">
+          <thead>
+            <tr>
+              <th>Reference #</th>
+              <th>Subject</th>
+              <th>Category</th>
+              <th>Status</th>
+              <th>Priority</th>
+              <th>Created Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ticket in user_tickets %}
+              <tr>
+                <td>
+                  <strong style="color: var(--accent-hover); font-family: monospace;">{{ ticket.reference_number }}</strong>
+                </td>
+                <td>
+                  <a href="{% url 'ticket_detail' ticket.reference_number %}" style="font-weight: 600; color: var(--text-primary);">
+                    {{ ticket.subject }}
+                  </a>
+                </td>
+                <td><span style="font-size: 0.85rem; color: var(--text-secondary);">{{ ticket.category }}</span></td>
+                <td>
+                  <span class="badge {{ ticket.status_badge_class }}">{{ ticket.status }}</span>
+                </td>
+                <td>
+                  <span style="font-size: 0.85rem; color: var(--text-secondary);">{{ ticket.priority }}</span>
+                </td>
+                <td><span style="font-size: 0.85rem; color: var(--text-muted);">{{ ticket.created_at|date:"M d, Y" }}</span></td>
+                <td>
+                  <a href="{% url 'ticket_detail' ticket.reference_number %}" class="btn btn-ghost btn-sm">
+                    View
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div style="background: var(--surface-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 2.5rem; text-align: center; color: var(--text-muted);">
+        <p>You have not submitted any support tickets yet.</p>
+        <p style="font-size: 0.85rem; margin-top: 0.35rem;">Use the form above or the AI assistant to file an inquiry.</p>
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+
+<style>
+  @media (max-width: 900px) {
+    div[style*="grid-template-columns: 1.2fr 0.8fr"] {
+      grid-template-columns: 1fr !important;
+    }
+  }
+</style>
+{% endblock %}

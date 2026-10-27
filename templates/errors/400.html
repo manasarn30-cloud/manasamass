@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}400 — Bad Request | StreamFlix{% endblock %}
+
+{% block content %}
+<div class="error-page-wrap">
+  <div class="error-code-huge">400</div>
+  <h1 class="error-title">Bad Request Syntax</h1>
+  <p class="error-description">
+    The server could not process your request due to invalid parameters or malformed data. Try clearing your browser cache or re-entering search parameters.
+  </p>
+
+  <div class="error-actions">
+    <a href="{% url 'home' %}" class="btn btn-primary btn-lg">Return Home</a>
+    <button type="button" class="btn btn-ghost btn-lg" data-open-assistant="Explain Error 400">
+      Ask the Assistant
+    </button>
+  </div>
+</div>
+{% endblock %}

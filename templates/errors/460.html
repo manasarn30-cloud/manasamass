@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}460 — Application Diagnostic Error | StreamFlix{% endblock %}
+
+{% block content %}
+<div class="error-page-wrap">
+  <div class="error-code-huge" style="background: linear-gradient(135deg, #F4B942 0%, #FF5C68 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">460</div>
+  <h1 class="error-title">StreamFlix Application Diagnostic Event</h1>
+  <p class="error-description">
+    This code is an application-level diagnostic convention specific to StreamFlix (not a standardized RFC HTTP error). It is used for internal support triage, resilience testing, and diagnostic simulation.
+  </p>
+
+  <div class="error-actions">
+    <a href="{% url 'home' %}" class="btn btn-primary btn-lg">Return to Dashboard</a>
+    <a href="{% url 'support' %}" class="btn btn-secondary btn-lg">Open Support Ticket</a>
+    <button type="button" class="btn btn-ghost btn-lg" data-open-assistant="What is error 460?">
+      Ask the Assistant
+    </button>
+  </div>
+</div>
+{% endblock %}

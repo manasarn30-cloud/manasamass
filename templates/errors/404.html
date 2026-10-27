@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}404 — Page Not Found | StreamFlix{% endblock %}
+
+{% block content %}
+<div class="error-page-wrap">
+  <div class="error-code-huge">404</div>
+  <h1 class="error-title">Looks like this title went off the grid.</h1>
+  <p class="error-description">
+    The page or film you're looking for doesn't exist, has been reorganized, or the link may have expired.
+  </p>
+
+  <div class="error-actions">
+    <a href="{% url 'home' %}" class="btn btn-primary btn-lg">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+      Return Home
+    </a>
+    <a href="{% url 'discover' %}" class="btn btn-secondary btn-lg">
+      Browse Movies
+    </a>
+    <button type="button" class="btn btn-ghost btn-lg" data-open-assistant="Explain Error 404">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+      Ask the Assistant
+    </button>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Frequently Asked Questions & Help Center — StreamFlix{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 3rem; padding-bottom: 5rem;">
+
+  <div class="faq-header">
+    <span class="badge badge-warning" style="margin-bottom: 0.75rem;">Support Knowledge Base</span>
+    <h1 class="faq-title">How can we help you?</h1>
+    <p style="color: var(--text-muted); font-size: 1.05rem; max-width: 600px; margin: 0 auto 1.5rem auto;">
+      Find answers to account, playback, technical diagnostic codes, and platform questions powered directly by our SQL database.
+    </p>
+
+    <!-- Search Form -->
+    <form method="GET" action="{% url 'faq' %}" style="max-width: 580px; margin: 0 auto 2rem auto; position: relative;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position: absolute; left: 1.25rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input
+        type="search"
+        name="q"
+        value="{{ search_query }}"
+        class="form-input"
+        style="padding-left: 3.25rem; border-radius: var(--radius-full); height: 50px; font-size: 1rem;"
+        placeholder="Type keywords (e.g. 404, sign in, My List, TMDB)..."
+      />
+    </form>
+
+    <!-- Category Filter Chips -->
+    <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+      {% for cat in categories %}
+        <a
+          href="{% url 'faq' %}?category={{ cat }}{% if search_query %}&q={{ search_query }}{% endif %}"
+          class="genre-chip {% if selected_category == cat %}active{% endif %}"
+        >
+          {{ cat }}
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- FAQ Accordion List -->
+  <div class="faq-section">
+    {% if faqs %}
+      <div class="faq-accordion" role="region" aria-label="FAQ Accordion">
+        {% for faq in faqs %}
+          <div class="faq-item" id="faq-item-{{ faq.id }}">
+            <button
+              class="faq-question-btn"
+              type="button"
+              onclick="toggleFaq({{ faq.id }});"
+              aria-expanded="false"
+              aria-controls="faq-ans-{{ faq.id }}"
+            >
+              <span style="display: flex; align-items: center; gap: 0.75rem;">
+                <span class="badge badge-muted" style="font-size: 0.7rem;">{{ faq.category }}</span>
+                <span>{{ faq.question }}</span>
+              </span>
+              <span class="faq-icon">▼</span>
+            </button>
+            <div id="faq-ans-{{ faq.id }}" class="faq-answer">
+              <p>{{ faq.answer }}</p>
+              <div style="margin-top: 1rem; display: flex; align-items: center; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); border-top: 1px solid var(--border-subtle); padding-top: 0.75rem;">
+                <span>Reference: FAQ #{{ faq.id }}</span>
+                <button
+                  type="button"
+                  class="btn btn-ghost btn-sm"
+                  style="font-size: 0.78rem; padding: 0.2rem 0.5rem;"
+                  data-open-assistant="{{ faq.question }}"
+                >
+                  Ask Assistant about this
+                </button>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-state-icon">🔍</div>
+        <h2 class="empty-state-title">No Matching FAQs Found</h2>
+        <p class="empty-state-text">
+          We couldn't find an answer matching your query. Our AI Assistant can help, or you can submit a support ticket.
+        </p>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+          <a href="{% url 'faq' %}" class="btn btn-secondary">View All FAQs</a>
+          <button type="button" class="btn btn-primary" data-open-assistant="{% if search_query %}{{ search_query }}{% else %}I need help with StreamFlix{% endif %}">
+            Ask the Assistant
+          </button>
+          <a href="{% url 'support' %}" class="btn btn-ghost">Open Support Ticket</a>
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- Bottom Assistance Callout -->
+    <div style="margin-top: 3.5rem; background: var(--surface-card); border: 1px solid var(--border-medium); border-radius: var(--radius-lg); padding: 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem;">
+      <div>
+        <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.25rem;">Still have questions?</h3>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">
+          Our StreamFlix Assistant is online 24/7 on every page, or you can open a support ticket for our engineering team.
+        </p>
+      </div>
+      <div style="display: flex; gap: 0.75rem;">
+        <button type="button" class="btn btn-primary" data-open-assistant="true">
+          Open Chatbot
+        </button>
+        <a href="{% url 'support' %}" class="btn btn-secondary">
+          Support Desk
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function toggleFaq(id) {
+    const item = document.getElementById('faq-item-' + id);
+    if (!item) return;
+    const isOpen = item.classList.contains('open');
+    // Close other open faqs
+    document.querySelectorAll('.faq-item.open').forEach(el => {
+      if (el !== item) el.classList.remove('open');
+    });
+    item.classList.toggle('open', !isOpen);
+  }
+</script>
+{% endblock %}

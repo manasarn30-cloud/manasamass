@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}User Profile — {{ user.username }} | StreamFlix{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 3rem; padding-bottom: 5rem; max-width: 900px;">
+
+  <div style="background: var(--surface-card); border: 1px solid var(--border-medium); border-radius: var(--radius-lg); padding: 2.5rem; margin-bottom: 2rem; box-shadow: var(--shadow-md);">
+    <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+      <div class="user-avatar" style="width: 72px; height: 72px; font-size: 1.8rem; box-shadow: var(--shadow-glow);">
+        {{ user.username|slice:":1" }}
+      </div>
+      <div>
+        <h1 style="font-size: 1.8rem; font-weight: 800;">{{ user.username }}</h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">
+          {{ user.email }} • Member since {{ user.date_joined|date:"F Y" }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Quick Metrics Row -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-subtle);">
+      <div style="background: var(--surface-elevated); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+        <span style="color: var(--text-muted); font-size: 0.82rem; text-transform: uppercase;">Saved to My List</span>
+        <div style="font-size: 1.6rem; font-weight: 800; color: var(--accent-hover); margin-top: 0.25rem;">
+          {{ saved_movies_count }} Titles
+        </div>
+        <a href="{% url 'my_list' %}" style="font-size: 0.8rem; color: var(--text-secondary); text-decoration: underline; margin-top: 0.25rem; display: inline-block;">View Library →</a>
+      </div>
+
+      <div style="background: var(--surface-elevated); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+        <span style="color: var(--text-muted); font-size: 0.82rem; text-transform: uppercase;">Support Tickets</span>
+        <div style="font-size: 1.6rem; font-weight: 800; color: var(--info); margin-top: 0.25rem;">
+          {{ tickets_count }} Inquiries
+        </div>
+        <a href="{% url 'support' %}" style="font-size: 0.8rem; color: var(--text-secondary); text-decoration: underline; margin-top: 0.25rem; display: inline-block;">View Tickets →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Preferences Form -->
+  <div style="background: var(--surface-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 2.5rem;">
+    <h2 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 1.25rem;">Preferences & Tastes</h2>
+
+    <form method="POST" action="{% url 'profile' %}">
+      {% csrf_token %}
+      <div class="form-group">
+        <label class="form-label" for="id_favorite_genre">Favorite Movie Genre</label>
+        {{ form.favorite_genre }}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="id_bio">Bio / About Your Movie Tastes</label>
+        {{ form.bio }}
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem;">
+        <button type="submit" class="btn btn-primary">
+          Save Preferences
+        </button>
+
+        <form action="{% url 'logout' %}" method="POST" style="display: inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-ghost" style="color: var(--error);">
+            Sign Out
+          </button>
+        </form>
+      </div>
+    </form>
+  </div>
+
+</div>
+{% endblock %}

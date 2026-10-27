@@ -1,0 +1,60 @@
+{% load static %}
+<div class="movie-card" data-card-id="{{ movie.id }}">
+  <div class="movie-poster-wrap">
+    <img
+      src="{{ movie.poster_url }}"
+      alt="{{ movie.title }} Poster"
+      class="movie-poster"
+      loading="lazy"
+      onerror="this.src='/static/images/poster_placeholder.png'"
+    />
+    <div class="movie-card-overlay">
+      <div class="card-top-actions">
+        <!-- Save to My List Button -->
+        <button
+          type="button"
+          class="save-movie-btn {% if movie.id in saved_ids %}saved{% endif %}"
+          data-movie-id="{{ movie.id }}"
+          title="{% if movie.id in saved_ids %}Remove from My List{% else %}Add to My List{% endif %}"
+          aria-label="Toggle My List"
+        >
+          {% if movie.id in saved_ids %}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          {% else %}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          {% endif %}
+        </button>
+      </div>
+
+      <div class="card-bottom-actions">
+        {% if movie.trailer_url %}
+          <button
+            type="button"
+            class="btn btn-primary btn-sm"
+            data-trailer-url="{{ movie.trailer_url }}"
+            style="flex: 1;"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            Trailer
+          </button>
+        {% endif %}
+        <a href="{% url 'movie_detail' movie.id %}" class="btn btn-secondary btn-sm" style="flex: 1;">
+          Details
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="movie-card-info">
+    <h3 class="movie-card-title" title="{{ movie.title }}">
+      <a href="{% url 'movie_detail' movie.id %}">{{ movie.title }}</a>
+    </h3>
+    <div class="movie-card-meta">
+      <span>{{ movie.release_year|default:"2024" }}</span>
+      <div class="rating-badge">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+        <span>{{ movie.rating|floatformat:1 }}</span>
+      </div>
+    </div>
+  </div>
+</div>

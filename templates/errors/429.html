@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}429 — Too Many Requests | StreamFlix{% endblock %}
+
+{% block content %}
+<div class="error-page-wrap">
+  <div class="error-code-huge">429</div>
+  <h1 class="error-title">Rate Limit Exceeded</h1>
+  <p class="error-description">
+    You have performed too many requests in a short duration. Please wait 30 to 60 seconds before submitting further requests to ensure system availability.
+  </p>
+
+  <div class="error-actions">
+    <button type="button" class="btn btn-primary btn-lg" onclick="setTimeout(() => window.location.reload(), 15000); this.disabled=true; this.textContent='Refreshing in 15s...';">
+      Wait & Retry
+    </button>
+    <a href="{% url 'home' %}" class="btn btn-secondary btn-lg">Return Home</a>
+    <button type="button" class="btn btn-ghost btn-lg" data-open-assistant="Explain Error 429">
+      Ask the Assistant
+    </button>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My List — Saved Movies | StreamFlix{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 3rem; padding-bottom: 5rem;">
+
+  <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 2rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1rem;">
+    <div>
+      <h1 style="font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px;">My List</h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.25rem;">
+        Your personal library of saved films and trailers. Stored securely in SQL.
+      </p>
+    </div>
+    <div>
+      <span class="badge badge-info" style="font-size: 0.85rem; padding: 0.35rem 0.85rem;">
+        <span class="my-list-counter">{{ total_saved }}</span> Titles Saved
+      </span>
+    </div>
+  </div>
+
+  {% if movies %}
+    <div class="movie-grid">
+      {% for movie in movies %}
+        {% include 'includes/movie_card.html' with movie=movie %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon">📌</div>
+      <h2 class="empty-state-title">Your List is Empty</h2>
+      <p class="empty-state-text">
+        You haven't saved any movies yet. Explore our trending releases, blockbusters, and curated categories to build your watchlist!
+      </p>
+      <div style="display: flex; gap: 1rem; justify-content: center;">
+        <a href="{% url 'discover' %}" class="btn btn-primary">Discover Movies</a>
+        <a href="{% url 'home' %}" class="btn btn-secondary">Home Dashboard</a>
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

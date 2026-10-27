@@ -1,0 +1,21 @@
+# Core Django framework
+django>=6.1.0,<6.2.0
+
+# Environment variables
+python-dotenv>=1.0.0
+
+# MongoDB driver for chatbot persistence
+pymongo>=4.10.0
+dnspython>=2.7.0
+
+# HTTP client for TMDB integration
+requests>=2.31.0
+
+# Production static file serving
+whitenoise>=6.8.0
+
+# Production WSGI server
+gunicorn>=23.0.0
+
+# Optional PostgreSQL database adapter for production (installed in production)
+# psycopg2-binary>=2.9.9
